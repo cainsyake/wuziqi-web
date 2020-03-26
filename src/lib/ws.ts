@@ -6,7 +6,7 @@ export let ws: WebSocket
 
 export function init() {
   // 打开一个WebSocket:
-  ws = new WebSocket(`ws://local.cainsyake.com:11220/?rid=${rid()}`)
+  ws = new WebSocket(`ws://www.cainsyake.com:11220/?rid=${rid()}`)
   // 响应onmessage事件:
   ws.onmessage = function(msg) {
     const data = JSON.parse(msg.data)

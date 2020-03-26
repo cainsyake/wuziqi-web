@@ -497,6 +497,7 @@ export default class Chess extends Vue {
   padding 10px 0
 
 .chessboard
+  margin-top 20px
   padding 20px
   background-color antiquewhite
 
