@@ -234,7 +234,9 @@ export default class Chess extends Vue {
   }
 
   handleStartGame(payload: IGameInfo) {
+    console.log(payload)
     this.gameStatus = GameStatus.play
+    console.log(`已重置游戏状态:${this.gameStatus}`)
     this.gameInfo = payload
     if (this.role !== payload.first) {
       this.currentStep.role = payload.first
@@ -289,7 +291,6 @@ export default class Chess extends Vue {
 
   startGame() {
     const players = this.getPlayers()
-    console.log(players)
     const payload: IGameInfo = {
       first: Math.random() >= 0.5 ? 'w' : 'b',
       w: players.w,
@@ -308,13 +309,19 @@ export default class Chess extends Vue {
     }
   }
 
-  handleGameOver(me: boolean) {
+  handleGameOver(win: boolean) {
     this.gameStatus = GameStatus.end
 
     Toast.success({
-      message: `游戏结束 \n 你${me ? '赢' : '输'}了。`,
-      duration: 5000,
+      message: `游戏结束 \n 你${win ? '赢' : '输'}了。`,
+      duration: 3000,
     })
+
+    const restartTime = 4000 + (win ? 0 : 1000)
+    // 6秒后自动开始游戏
+    setTimeout(() => {
+      this.handleRestart(win)
+    }, restartTime)
   }
 
   isWin(x: number, y: number, role: string) {
@@ -424,6 +431,45 @@ export default class Chess extends Vue {
       return true
     } else {
       return false
+    }
+  }
+
+  handleRestart(win: boolean) {
+    // 重置身份 胜利方重置身份为白(w)，败方重置身份为黑(b)，
+    const newRole = win ? 'w' : 'b'
+    const change = this.role !== newRole
+    this.role = newRole
+
+    // 交换角色
+    if (change) {
+      const temp = this.gameInfo.w
+      this.gameInfo.w = this.gameInfo.b
+      this.gameInfo.b = temp
+    }
+
+    // 清空数据
+    this.currentStep = {
+      role: '',
+      x: 0,
+      y: 0,
+      win: false,
+      w: '',
+      b: '',
+    }
+    this.stepLogs = []
+    this.focusPoint = {
+      x: 0,
+      y: 0,
+    }
+    this.lastTime = 0
+    clearTimeout(this.timer)
+    this.timer = null
+
+    // 重置为等待状态
+    this.gameStatus = GameStatus.wait
+
+    if (this.role === 'b') {
+      this.startGame()
     }
   }
 
