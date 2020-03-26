@@ -109,6 +109,7 @@ export default class Pre extends Vue {
         alert(`ID: ${payload.userId}已存在，请尝试别的ID`)
       } else {
         wsSend(serverCommands.registerId, { userId: payload.userId })
+        localStorage.userId = payload.userId
         this.currentStep = 2
       }
     } else {
